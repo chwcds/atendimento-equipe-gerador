@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1b4332">
+  <meta name="description" content="Aplicação PWA de Atendimento Equipe Gerador em lojas de supermercados.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Atendimento Equipe Gerador</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=15">
+</head>
+<body>
+
+  <!-- Banner de aviso offline -->
+  <div id="offline-banner" class="offline-banner hidden">
+    ⚡ Você está offline. Todas as alterações serão salvas localmente no celular.
+  </div>
+
+  <!-- Cabeçalho Fixo da Aplicação -->
+  <header class="app-header">
+    <div class="app-brand">
+      <span class="app-brand-logo">⚡</span>
+      <span class="app-brand-title">Atendimento Equipe Gerador</span>
+    </div>
+    <div class="app-header-actions">
+      <button id="btn-install-pwa" class="btn btn-sm btn-success hidden">📲 Instalar App</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- =========================================================================
+         1. TELA PRINCIPAL: IDENTIFICAÇÃO E SELEÇÃO DIRETA DE MÓDULOS (view-new-inspection)
+         ========================================================================= -->
+    <section id="view-new-inspection" class="app-view">
+      <div class="card">
+        <h2 class="card-title">📌 Identificação da Visita</h2>
+
+        <div class="form-group">
+          <label class="field-label">Responsável pela Visita <span class="required-asterisk">*</span></label>
+          <select id="select-user" class="form-control">
+            <option value="">-- Selecione o Responsável --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Loja <span class="required-asterisk">*</span></label>
+          <select id="select-store" class="form-control">
+            <option value="">-- Selecione a Loja --</option>
+          </select>
+        </div>
+
+        <!-- Detalhes da Loja Selecionada (Sem o campo Bandeira) -->
+        <div id="store-details-card" class="card hidden" style="background: #f8fafc; border-left: 4px solid var(--color-primary); margin-top: 12px; margin-bottom: 12px; padding: 12px;">
+          <h4 style="font-size: 0.95rem; color: var(--color-primary); margin-bottom: 4px;">Informações da Loja</h4>
+          <p style="font-size: 0.85rem;"><strong>Código:</strong> <span id="store-detail-code"></span></p>
+          <p style="font-size: 0.85rem;"><strong>Nome:</strong> <span id="store-detail-name"></span></p>
+          <p style="font-size: 0.85rem;"><strong>Endereço:</strong> <span id="store-detail-address"></span></p>
+        </div>
+      </div>
+
+      <!-- Módulos de Inspeção Diretos -->
+      <div class="card">
+        <div id="modules-selection-grid" class="modules-grid">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         2. TELA: DASHBOARD E HISTÓRICO (view-dashboard)
+         ========================================================================= -->
+    <section id="view-dashboard" class="app-view hidden">
+      <!-- Lista de Rascunhos em Andamento -->
+      <div class="card">
+        <h3 class="card-title">📝 Inspeções em Andamento (Rascunhos)</h3>
+        <div id="drafts-list">
+          <p class="text-muted text-center p-3">Carregando rascunhos...</p>
+        </div>
+      </div>
+
+      <!-- Lista de Relatórios Concluídos -->
+      <div class="card">
+        <h3 class="card-title">✅ Relatórios Concluídos</h3>
+        <div id="completed-list">
+          <p class="text-muted text-center p-3">Carregando histórico...</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <button id="btn-clear-all-data" class="btn btn-sm btn-danger" style="width: auto;">
+          🗑️ Limpar Todos os Dados Locais
+        </button>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         3. TELA: INSPEÇÃO ATIVA (view-inspection-active)
+         ========================================================================= -->
+    <section id="view-inspection-active" class="app-view hidden">
+      <!-- Barra de Progresso Ficha -->
+      <div class="progress-container">
+        <div class="progress-header">
+          <span>Progresso da Inspeção</span>
+          <span id="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats-row">
+          <span>Respondidas: <strong id="stat-answered-count">0</strong>/<span id="stat-total-count">0</span></span>
+          <span style="color: var(--color-danger);">Não Conformidades: <strong id="stat-nc-count">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Container do Cartão da Pergunta Atual -->
+      <div id="active-question-container">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <!-- Controles de Navegação entre Perguntas -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <button id="btn-prev-question" class="btn btn-secondary" style="flex: 1;">⬅️ Anterior</button>
+        <button id="btn-save-draft" class="btn btn-secondary" style="flex: 1;">💾 Rascunho</button>
+        <button id="btn-next-question" class="btn btn-primary" style="flex: 1.5;">Próxima ➔</button>
+      </div>
+
+      <button id="btn-finish-checklist" class="btn btn-success">
+        🏁 Finalizar Inspeção & Gerar PDF
+      </button>
+    </section>
+
+    <!-- =========================================================================
+         4. TELA: REVISÃO FINAL E AÇÕES DO PDF (view-review)
+         ========================================================================= -->
+    <section id="view-review" class="app-view hidden">
+      <div class="card">
+        <h2 class="card-title">📊 Inspeção Concluída - Relatório PDF</h2>
+
+        <div style="background: #f8fafc; border-radius: 8px; padding: 12px; margin-bottom: 14px; font-size: 0.85rem;">
+          <p><strong>Responsável:</strong> <span id="rev-user"></span></p>
+          <p><strong>Loja:</strong> <span id="rev-store"></span></p>
+          <p><strong>Endereço:</strong> <span id="rev-address"></span></p>
+          <p><strong>Data/Hora:</strong> <span id="rev-datetime"></span></p>
+          <p><strong>Coordenadas GPS:</strong> <span id="rev-geo"></span></p>
+          <p><strong>Módulos Inspecionados:</strong> <span id="rev-modules"></span></p>
+        </div>
+
+        <h4 style="font-size: 0.95rem; color: var(--color-primary); margin-bottom: 8px;">Resumo da Visita</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; text-align: center; font-size: 0.85rem;">
+          <div style="background: #e2e8f0; padding: 8px; border-radius: 6px;">Total Avaliados: <strong id="rev-stat-total">0</strong></div>
+          <div style="background: #d8f3dc; padding: 8px; border-radius: 6px; color: var(--color-success);">Conformes: <strong id="rev-stat-conformes">0</strong></div>
+          <div style="background: #ffe5e5; padding: 8px; border-radius: 6px; color: var(--color-danger);">Não Conformes: <strong id="rev-stat-nc">0</strong></div>
+          <div style="background: #fef3c7; padding: 8px; border-radius: 6px;">Não Aplicáveis: <strong id="rev-stat-na">0</strong></div>
+        </div>
+
+        <div style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 0.82rem;">
+          <p>📸 Total de Fotografias Anexadas: <strong id="rev-stat-photos">0</strong></p>
+        </div>
+
+        <!-- Opções de Ação do PDF -->
+        <h4 style="font-size: 0.95rem; color: var(--color-primary); margin-bottom: 10px; text-align: center;">Escolha como deseja obter o PDF:</h4>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+          <button id="btn-download-pdf-only" class="btn btn-primary" style="padding: 14px; font-size: 1rem;">
+            💾 Salvar PDF no Celular / Computador
+          </button>
+          <button id="btn-share-pdf-only" class="btn btn-success" style="padding: 14px; font-size: 1rem;">
+            📲 Enviar / Compartilhar PDF (WhatsApp, E-mail)
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button id="btn-review-back" class="btn btn-secondary" style="flex:1;">⬅️ Voltar e Editar</button>
+          <button id="btn-review-new-visit" class="btn btn-outline" style="flex:1;">➕ Nova Visita</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Navegação Inferior Estilo App Mobile -->
+  <nav class="bottom-nav">
+    <button id="btn-start-inspection-nav" class="nav-item active">
+      <span class="nav-item-icon">📋</span>
+      <span>Inspeção</span>
+    </button>
+    <button id="btn-dashboard-nav" class="nav-item">
+      <span class="nav-item-icon">📂</span>
+      <span>Histórico & Rascunhos</span>
+    </button>
+  </nav>
+
+  <!-- Modal de Carregamento de GPS -->
+  <div id="modal-geo-loading" class="modal-backdrop hidden">
+    <div class="modal-content text-center">
+      <h3 style="color: var(--color-primary); margin-bottom: 10px;">📍 Capturando Geolocalização</h3>
+      <p class="text-muted">Aguardando coordenadas de GPS do celular...</p>
+    </div>
+  </div>
+
+  <!-- Modal de Visualização de Foto -->
+  <div id="modal-photo-preview" class="modal-backdrop hidden">
+    <div class="modal-content text-center">
+      <img id="preview-modal-img" src="" alt="Visualização">
+      <button class="btn btn-secondary close-modal mt-3">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Carregamento de Dados e Scripts da Aplicação -->
+  <script src="users-data.js?v=15"></script>
+  <script src="stores-data.js?v=15"></script>
+  <script src="checklist-data.js?v=15"></script>
+  
+  <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
+  <script src="lib/jspdf.umd.min.js?v=15"></script>
+
+  <!-- Gerador de PDF e Lógica Principal -->
+  <script src="pdf-generator.js?v=15"></script>
+  <script src="app.js?v=15"></script>
+
+  <!-- Registro do Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js?v=15')
+          .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
+          .catch(err => console.error('Erro ao registrar Service Worker:', err));
+      });
+    }
+  </script>
+</body>
+</html>
