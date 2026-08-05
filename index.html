@@ -9,12 +9,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Atendimento Equipe Gerador</title>
 
-  <!-- PWA Manifest -->
+  <!-- PWA Manifest & App Icons (Gerador Amarelo Caterpillar) -->
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=17">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=17">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
 
@@ -41,9 +42,9 @@
          ========================================================================= -->
     <section id="view-new-inspection" class="app-view">
 
-      <!-- Banner Ilustrativo do Gerador Caterpillar -->
+      <!-- Banner Ilustrativo do Gerador Caterpillar Amarelo -->
       <div class="generator-app-banner">
-        <img src="img/generator.png" alt="Grupo Gerador" class="generator-banner-img">
+        <img src="img/generator.png" alt="Grupo Gerador Caterpillar" class="generator-banner-img">
       </div>
 
       <div class="card">
@@ -220,22 +221,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=16"></script>
-  <script src="stores-data.js?v=16"></script>
-  <script src="checklist-data.js?v=16"></script>
+  <script src="users-data.js?v=17"></script>
+  <script src="stores-data.js?v=17"></script>
+  <script src="checklist-data.js?v=17"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=16"></script>
+  <script src="lib/jspdf.umd.min.js?v=17"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=16"></script>
-  <script src="app.js?v=16"></script>
+  <script src="pdf-generator.js?v=17"></script>
+  <script src="app.js?v=17"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=16')
+        navigator.serviceWorker.register('service-worker.js?v=17')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });

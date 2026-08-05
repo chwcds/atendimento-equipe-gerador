@@ -1,8 +1,8 @@
 /**
- * SERVICE WORKER - PWA Offline Cache Manager (v16)
+ * SERVICE WORKER - PWA Offline Cache Manager (v17)
  */
 
-const CACHE_NAME = 'supermarket-checklist-v16';
+const CACHE_NAME = 'supermarket-checklist-v17';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -17,6 +17,7 @@ const ASSETS_TO_CACHE = [
   './lib/jspdf.umd.min.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
   './img/generator.png'
 ];
 
