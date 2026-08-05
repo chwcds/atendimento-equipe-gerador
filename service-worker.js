@@ -1,8 +1,8 @@
 /**
- * SERVICE WORKER - PWA Offline Cache Manager (v15)
+ * SERVICE WORKER - PWA Offline Cache Manager (v16)
  */
 
-const CACHE_NAME = 'supermarket-checklist-v15';
+const CACHE_NAME = 'supermarket-checklist-v16';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -16,7 +16,8 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './lib/jspdf.umd.min.js',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './img/generator.png'
 ];
 
 self.addEventListener('install', (event) => {

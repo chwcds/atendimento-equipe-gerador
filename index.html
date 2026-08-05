@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
 
@@ -40,6 +40,12 @@
          1. TELA PRINCIPAL: IDENTIFICAÇÃO E SELEÇÃO DIRETA DE MÓDULOS (view-new-inspection)
          ========================================================================= -->
     <section id="view-new-inspection" class="app-view">
+
+      <!-- Banner Ilustrativo do Gerador Caterpillar -->
+      <div class="generator-app-banner">
+        <img src="img/generator.png" alt="Grupo Gerador" class="generator-banner-img">
+      </div>
+
       <div class="card">
         <h2 class="card-title">📌 Identificação da Visita</h2>
 
@@ -214,22 +220,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=15"></script>
-  <script src="stores-data.js?v=15"></script>
-  <script src="checklist-data.js?v=15"></script>
+  <script src="users-data.js?v=16"></script>
+  <script src="stores-data.js?v=16"></script>
+  <script src="checklist-data.js?v=16"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=15"></script>
+  <script src="lib/jspdf.umd.min.js?v=16"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=15"></script>
-  <script src="app.js?v=15"></script>
+  <script src="pdf-generator.js?v=16"></script>
+  <script src="app.js?v=16"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=15')
+        navigator.serviceWorker.register('service-worker.js?v=16')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });
