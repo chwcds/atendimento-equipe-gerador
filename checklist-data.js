@@ -1,5 +1,6 @@
 /**
  * CHECKLIST DATA - Estrutura dos Módulos e Perguntas do Checklist
+ * Atualizado conforme planilha de revisão Excel (Revisao_Perguntas_Checklist_Gerador.xlsx)
  */
 
 const CHECKLIST_MODULES = [
@@ -30,32 +31,18 @@ const CHECKLIST_MODULES = [
     shortName: "Capacitores",
     icon: "cpu",
     description: "Verificação das células, térmico e medidor de reativo"
-  },
-  {
-    id: "eletrica",
-    name: "Elétrica",
-    shortName: "Elétrica",
-    icon: "activity",
-    description: "Inspeção dos quadros, cabos e dispositivos de proteção"
-  },
-  {
-    id: "iluminacao",
-    name: "Iluminação",
-    shortName: "Iluminação",
-    icon: "sun",
-    description: "Nível de iluminância, emergência e lâmpadas do salão e áreas internas"
   }
 ];
 
 // Perguntas por Módulo
 const CHECKLIST_QUESTIONS = {
-  // 1. ROTINA GERADOR
+  // 1. ROTINA GERADOR (20 itens)
   rotina_gerador: [
     // --- Dados Técnicos ---
     {
       id: "rg_abrangencia",
       section: "Dados técnicos",
-      label: "Esse gerador atende essa loja?",
+      label: "Esse gerador é parcial ou total?",
       type: "options_3",
       options: ["Total", "Parcial"],
       required: true,
@@ -65,25 +52,37 @@ const CHECKLIST_QUESTIONS = {
       id: "rg_fabricante",
       section: "Dados técnicos",
       label: "Fabricante do Gerador",
-      type: "text",
+      type: "options_3",
+      options: ["Stemac", "Cummins", "MWM", "Atlas Copco", "Maxitrust", "Rodo Agro", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: STEMAC, Cummins, MWM..."
+      allowOtherText: true
     },
     {
       id: "rg_marca_motor",
       section: "Dados técnicos",
       label: "Marca / Motor",
-      type: "text",
+      type: "options_3",
+      options: ["Cummins", "MWM", "Perkins", "Scania", "Volvo Penta", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: Scania, Perkins, MWM..."
+      allowOtherText: true
+    },
+    {
+      id: "rg_fabricante_alternador",
+      section: "Dados técnicos",
+      label: "Fabricante do alternador",
+      type: "options_3",
+      options: ["WEG", "Stamford", "Mecc Alte", "Outro"],
+      requirePhoto: true,
+      allowOtherText: true
     },
     {
       id: "rg_usca_controlador",
       section: "Dados técnicos",
       label: "USCA / Controlador",
-      type: "text",
+      type: "options_3",
+      options: ["Deep Sea", "DEIF", "Stemac", "KVA", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: DeepSea, ComAp, Komas..."
+      allowOtherText: true
     },
     {
       id: "rg_potencia_kva",
@@ -97,9 +96,9 @@ const CHECKLIST_QUESTIONS = {
       id: "rg_tensao_v",
       section: "Dados técnicos",
       label: "Tensão (V)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 380 ou 220"
+      type: "options_3",
+      options: ["220", "380"],
+      requirePhoto: true
     },
     {
       id: "rg_qtd_baterias",
@@ -107,15 +106,7 @@ const CHECKLIST_QUESTIONS = {
       label: "Quantidade de Baterias",
       type: "options_3",
       options: ["1 Bateria", "2 Baterias"],
-      requirePhoto: true
-    },
-    {
-      id: "rg_amperagem_bat",
-      section: "Dados técnicos",
-      label: "Amperagem das baterias (Ah)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 150"
+      noPhoto: true
     },
     {
       id: "rg_tensao_flutuacao_bat",
@@ -128,20 +119,11 @@ const CHECKLIST_QUESTIONS = {
 
     // --- Sistema de Transferência ---
     {
-      id: "rg_possui_qta",
-      section: "Sistema de transferência",
-      label: "Possui QTA (Quadro de Transferência Automática)?",
-      type: "options_3",
-      options: ["Sim", "Não"],
-      requirePhoto: true
-    },
-    {
       id: "rg_qta_composicao",
       section: "Sistema de transferência",
       label: "Composição do QTA",
       type: "options_3",
-      options: ["Contatoras", "Disjuntores", "Chaves"],
-      condition: { questionId: "rg_possui_qta", value: "Sim" },
+      options: ["Contatoras", "Disjuntores", "Chave comutadora (I - 0 - II)"],
       requirePhoto: true
     },
     {
@@ -158,7 +140,8 @@ const CHECKLIST_QUESTIONS = {
       id: "rg_q1",
       section: "Checklist de rotina",
       label: "1. Acessibilidade à sala desobstruída?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
       requirePhoto: true,
       defaultPriority: "Alta"
@@ -167,43 +150,28 @@ const CHECKLIST_QUESTIONS = {
       id: "rg_q2",
       section: "Checklist de rotina",
       label: "2. Existe vestígio de insetos ou roedores?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Sim",
       requirePhotoOnValue: "Sim",
       defaultPriority: "Média"
     },
     {
-      id: "rg_q3",
-      section: "Checklist de rotina",
-      label: "3. Controlador ligado, sem alarme e em automático?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Crítica"
-    },
-    {
       id: "rg_q5",
       section: "Checklist de rotina",
-      label: "4. Gerador sem vazamento aparente?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhotoOnValue: "Não",
+      label: "4. Gerador possui vazamentos de água ou óleo?",
+      type: "options_3",
+      options: ["Sim", "Não"],
+      nonConformingValue: "Sim",
+      requirePhotoOnValue: "Sim",
       defaultPriority: "Alta"
     },
     {
       id: "rg_q6",
       section: "Checklist de rotina",
       label: "5. Baterias em bom estado?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Alta"
-    },
-    {
-      id: "rg_q7",
-      section: "Checklist de rotina",
-      label: "6. Carregador de bateria em bom estado?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
       requirePhoto: true,
       defaultPriority: "Alta"
@@ -212,22 +180,24 @@ const CHECKLIST_QUESTIONS = {
       id: "rg_q8",
       section: "Checklist de rotina",
       label: "7. Conferido nível de água do radiador?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
-      requirePhoto: true,
+      noPhoto: true,
       defaultPriority: "Alta"
     },
     {
       id: "rg_q9",
       section: "Checklist de rotina",
       label: "8. Conferido nível de óleo lubrificante?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
       requirePhoto: true,
       defaultPriority: "Alta"
     },
 
-    // Nível do diesel
+    // --- Nível do diesel ---
     {
       id: "rg_nivel_diesel",
       section: "Nível do diesel",
@@ -238,33 +208,17 @@ const CHECKLIST_QUESTIONS = {
       required: true
     },
 
-    // Medições
+    // --- Medições ---
     {
       id: "rg_corrente_a",
       section: "Medições",
-      label: "10. Corrente fase A (A)",
-      type: "number",
+      label: "10. Corrente fase A B C do gerador operando",
+      type: "text",
       requirePhoto: true,
-      placeholder: "Ex: 210"
-    },
-    {
-      id: "rg_corrente_b",
-      section: "Medições",
-      label: "11. Corrente fase B (A)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 205"
-    },
-    {
-      id: "rg_corrente_c",
-      section: "Medições",
-      label: "12. Corrente fase C (A)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 212"
+      placeholder: "Ex: A: 210A, B: 205A, C: 212A"
     },
 
-    // Fechamento
+    // --- Fechamento ---
     {
       id: "rg_usca_auto",
       section: "Fechamento",
@@ -278,13 +232,13 @@ const CHECKLIST_QUESTIONS = {
     }
   ],
 
-  // 2. PREVENTIVA GERADOR
+  // 2. PREVENTIVA GERADOR (29 itens)
   preventiva_gerador: [
     // --- Dados Técnicos ---
     {
       id: "pg_abrangencia",
       section: "Dados técnicos",
-      label: "Esse gerador atende essa loja?",
+      label: "Esse gerador é total ou parcial?",
       type: "options_3",
       options: ["Total", "Parcial"],
       required: true,
@@ -294,25 +248,37 @@ const CHECKLIST_QUESTIONS = {
       id: "pg_fabricante",
       section: "Dados técnicos",
       label: "Fabricante do Gerador",
-      type: "text",
+      type: "options_3",
+      options: ["Stemac", "Cummins", "MWM", "Atlas Copco", "Maxitrust", "Rodo Agro", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: STEMAC, Cummins, MWM..."
+      allowOtherText: true
     },
     {
       id: "pg_marca_motor",
       section: "Dados técnicos",
-      label: "Marca / Motor",
-      type: "text",
+      label: "Modelo e marca motor a combustão",
+      type: "options_3",
+      options: ["Cummins", "MWM", "Perkins", "Scania", "Volvo Penta", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: Scania, Perkins, MWM..."
+      allowOtherText: true
+    },
+    {
+      id: "pg_fabricante_alternador",
+      section: "Dados técnicos",
+      label: "Fabricante do alternador",
+      type: "options_3",
+      options: ["WEG", "Stamford", "Mecc Alte", "Outro"],
+      requirePhoto: true,
+      allowOtherText: true
     },
     {
       id: "pg_usca_controlador",
       section: "Dados técnicos",
       label: "USCA / Controlador",
-      type: "text",
+      type: "options_3",
+      options: ["Deep Sea", "DEIF", "Stemac", "KVA", "Outro"],
       requirePhoto: true,
-      placeholder: "Ex: DeepSea, ComAp, Komas..."
+      allowOtherText: true
     },
     {
       id: "pg_potencia_kva",
@@ -326,30 +292,14 @@ const CHECKLIST_QUESTIONS = {
       id: "pg_tensao_v",
       section: "Dados técnicos",
       label: "Tensão (V)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 380 ou 220"
-    },
-    {
-      id: "pg_qtd_baterias",
-      section: "Dados técnicos",
-      label: "Quantidade de Baterias",
       type: "options_3",
-      options: ["1 Bateria", "2 Baterias"],
+      options: ["220", "380"],
       requirePhoto: true
-    },
-    {
-      id: "pg_amperagem_bat",
-      section: "Dados técnicos",
-      label: "Amperagem das baterias (Ah)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 150"
     },
     {
       id: "pg_tensao_flutuacao_bat",
       section: "Dados técnicos",
-      label: "Qual a tensão de flutuação da bateria (V)?",
+      label: "Tensão de flutuação da bateria (V)?",
       type: "number",
       requirePhoto: true,
       placeholder: "Ex: 27.2 ou 13.6"
@@ -357,20 +307,11 @@ const CHECKLIST_QUESTIONS = {
 
     // --- Sistema de Transferência ---
     {
-      id: "pg_possui_qta",
-      section: "Sistema de transferência",
-      label: "Possui QTA (Quadro de Transferência Automática)?",
-      type: "options_3",
-      options: ["Sim", "Não"],
-      requirePhoto: true
-    },
-    {
       id: "pg_qta_composicao",
       section: "Sistema de transferência",
       label: "Composição do QTA",
       type: "options_3",
-      options: ["Contatoras", "Disjuntores", "Chaves"],
-      condition: { questionId: "pg_possui_qta", value: "Sim" },
+      options: ["Contatoras", "Disjuntores", "Chave comutadora (I - 0 - II)"],
       requirePhoto: true
     },
     {
@@ -382,81 +323,59 @@ const CHECKLIST_QUESTIONS = {
       requirePhotoOnValue: "Sim"
     },
 
-    // --- Inspeção Técnica de Rotina ---
+    // --- Checklist de Rotina ---
     {
       id: "pg_q1",
-      section: "Inspeção técnica",
+      section: "Checklist de rotina",
       label: "1. Acessibilidade à sala desobstruída?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
       requirePhoto: true,
       defaultPriority: "Alta"
     },
     {
       id: "pg_q2",
-      section: "Inspeção técnica",
+      section: "Checklist de rotina",
       label: "2. Existe vestígio de insetos ou roedores?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Sim",
       requirePhotoOnValue: "Sim",
       defaultPriority: "Média"
     },
     {
-      id: "pg_q3",
-      section: "Inspeção técnica",
-      label: "3. Controlador ligado, sem alarme e em automático?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Crítica"
-    },
-    {
       id: "pg_q5",
-      section: "Inspeção técnica",
-      label: "4. Gerador sem vazamento aparente?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhotoOnValue: "Não",
-      defaultPriority: "Alta"
-    },
-    {
-      id: "pg_q6",
-      section: "Inspeção técnica",
-      label: "5. Baterias em bom estado?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Alta"
-    },
-    {
-      id: "pg_q7",
-      section: "Inspeção técnica",
-      label: "6. Carregador de bateria em bom estado?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
+      section: "Checklist de rotina",
+      label: "4. Gerador possui vazamentos de água ou óleo?",
+      type: "options_3",
+      options: ["Sim", "Não"],
+      nonConformingValue: "Sim",
+      requirePhotoOnValue: "Sim",
       defaultPriority: "Alta"
     },
     {
       id: "pg_q8",
-      section: "Inspeção técnica",
+      section: "Checklist de rotina",
       label: "7. Conferido nível de água do radiador?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
-      requirePhoto: true,
+      noPhoto: true,
       defaultPriority: "Alta"
     },
     {
       id: "pg_q9",
-      section: "Inspeção técnica",
+      section: "Checklist de rotina",
       label: "8. Conferido nível de óleo lubrificante?",
-      type: "tri_state",
+      type: "options_3",
+      options: ["Sim", "Não"],
       nonConformingValue: "Não",
       requirePhoto: true,
       defaultPriority: "Alta"
     },
 
-    // Nível do diesel
+    // --- Nível do diesel ---
     {
       id: "pg_nivel_diesel",
       section: "Nível do diesel",
@@ -467,14 +386,24 @@ const CHECKLIST_QUESTIONS = {
       required: true
     },
 
-    // --- Intervenções da Preventiva (Com os novos campos solicitados) ---
+    // --- Medições ---
+    {
+      id: "pg_corrente_a",
+      section: "Medições",
+      label: "10. Corrente fase A B C do gerador operando",
+      type: "text",
+      requirePhoto: true,
+      placeholder: "Ex: A: 210A, B: 205A, C: 212A"
+    },
+
+    // --- Intervenções da Preventiva ---
     {
       id: "pg_int_filtro_oleo",
       section: "Intervenções da Preventiva",
       label: "Foi trocado o filtro de óleo?",
       type: "options_3",
       options: ["Sim", "Não", "Observação"],
-      requirePhoto: true,
+      noPhoto: true,
       requireTextOnObs: true,
       nonConformingValue: "Não",
       defaultPriority: "Alta"
@@ -485,7 +414,6 @@ const CHECKLIST_QUESTIONS = {
       label: "Qual modelo do filtro de óleo?",
       type: "text",
       requirePhoto: true,
-      required: true,
       placeholder: "Digite o modelo do filtro de óleo..."
     },
     {
@@ -494,7 +422,7 @@ const CHECKLIST_QUESTIONS = {
       label: "Foi trocado o filtro de ar?",
       type: "options_3",
       options: ["Sim", "Não", "Observação"],
-      requirePhoto: true,
+      noPhoto: true,
       requireTextOnObs: true,
       nonConformingValue: "Não",
       defaultPriority: "Alta"
@@ -505,7 +433,6 @@ const CHECKLIST_QUESTIONS = {
       label: "Qual modelo do filtro de ar?",
       type: "text",
       requirePhoto: true,
-      required: true,
       placeholder: "Digite o modelo do filtro de ar..."
     },
     {
@@ -531,7 +458,7 @@ const CHECKLIST_QUESTIONS = {
       label: "Foi trocado o óleo lubrificante do motor?",
       type: "options_3",
       options: ["Sim", "Não", "Observação"],
-      requirePhoto: true,
+      noPhoto: true,
       requireTextOnObs: true,
       nonConformingValue: "Não",
       defaultPriority: "Alta"
@@ -542,25 +469,15 @@ const CHECKLIST_QUESTIONS = {
       label: "Quantos litros de óleo lubrificante foram colocados no gerador?",
       type: "number",
       requirePhoto: true,
-      required: true,
       placeholder: "Ex: 25"
-    },
-    {
-      id: "pg_int_trocou_bateria",
-      section: "Intervenções da Preventiva",
-      label: "Foi trocada a bateria?",
-      type: "options_3",
-      options: ["Sim", "Não"],
-      requirePhotoOnValue: "Sim" // Foto obrigatória se Sim, se Não não precisa
     },
     {
       id: "pg_int_qtd_baterias_trocadas",
       section: "Intervenções da Preventiva",
       label: "Quantas baterias foram trocadas?",
       type: "options_3",
-      options: ["1 Bateria", "2 Baterias"],
-      condition: { questionId: "pg_int_trocou_bateria", value: "Sim" },
-      requirePhoto: true
+      options: ["Nenhuma", "1 Bateria", "2 Baterias"],
+      requirePhotoOnNonValue: "Nenhuma" // Foto obrigatória se trocou 1 ou 2 baterias
     },
     {
       id: "pg_int_carregador_bat",
@@ -574,39 +491,15 @@ const CHECKLIST_QUESTIONS = {
       defaultPriority: "Crítica"
     },
 
-    // --- Medições ---
-    {
-      id: "pg_corrente_a",
-      section: "Medições",
-      label: "Corrente fase A (A)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 210"
-    },
-    {
-      id: "pg_corrente_b",
-      section: "Medições",
-      label: "Corrente fase B (A)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 205"
-    },
-    {
-      id: "pg_corrente_c",
-      section: "Medições",
-      label: "Corrente fase C (A)",
-      type: "number",
-      requirePhoto: true,
-      placeholder: "Ex: 212"
-    },
-
     // --- Fechamento ---
     {
       id: "pg_obs_fechamento",
       section: "Fechamento",
-      label: "Observações gerais da preventiva",
-      type: "textarea",
-      requirePhoto: true
+      label: "Observações adicional da preventiva",
+      type: "options_3",
+      options: ["Sim", "Não"],
+      requirePhotoOnValue: "Sim",
+      requireTextOnValue: "Sim"
     },
     {
       id: "pg_usca_auto",
@@ -621,7 +514,7 @@ const CHECKLIST_QUESTIONS = {
     }
   ],
 
-  // 3. ROTINA SUBESTAÇÃO
+  // 3. ROTINA SUBESTAÇÃO (9 itens)
   rotina_subestacao: [
     {
       id: "sub_q1",
@@ -705,7 +598,7 @@ const CHECKLIST_QUESTIONS = {
     }
   ],
 
-  // 4. BANCO DE CAPACITORES
+  // 4. BANCO DE CAPACITORES (12 itens)
   banco_capacitores: [
     {
       id: "cap_foto_porta_fechada",
@@ -806,99 +699,6 @@ const CHECKLIST_QUESTIONS = {
       id: "cap_obs",
       section: "Fechamento",
       label: "Observações pertinentes do banco de capacitores",
-      type: "textarea",
-      requirePhoto: true
-    }
-  ],
-
-  // 5. ELÉTRICA
-  eletrica: [
-    {
-      id: "el_quadros_fechados",
-      section: "Instalações elétricas",
-      label: "Quadros elétricos identificados, fechados e desobstruídos?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Alta"
-    },
-    {
-      id: "el_sem_aquecimento",
-      section: "Instalações elétricas",
-      label: "Ausência de sinais de aquecimento ou cheiro de queimado?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Crítica"
-    },
-    {
-      id: "el_cabos_bom_estado",
-      section: "Instalações elétricas",
-      label: "Cabos e conexões aparentes em bom estado?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Alta"
-    },
-    {
-      id: "el_protecoes_ok",
-      section: "Instalações elétricas",
-      label: "Dispositivos de proteção sem sinais de avaria?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Crítica"
-    },
-    {
-      id: "el_obs",
-      section: "Observações",
-      label: "Observações elétricas",
-      type: "textarea",
-      requirePhoto: true
-    }
-  ],
-
-  // 6. ILUMINAÇÃO
-  iluminacao: [
-    {
-      id: "il_salao_vendas",
-      section: "Sistemas de iluminação",
-      label: "Iluminação do salão de vendas funcionando?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Média"
-    },
-    {
-      id: "il_areas_internas",
-      section: "Sistemas de iluminação",
-      label: "Iluminação das áreas internas funcionando?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Média"
-    },
-    {
-      id: "il_emergencia",
-      section: "Sistemas de iluminação",
-      label: "Iluminação de emergência em condições de uso?",
-      type: "tri_state",
-      nonConformingValue: "Não",
-      requirePhoto: true,
-      defaultPriority: "Alta"
-    },
-    {
-      id: "il_iluminancia_lux",
-      section: "Medições",
-      label: "Iluminância média medida em lux",
-      type: "number",
-      placeholder: "Ex: 450",
-      requirePhoto: true
-    },
-    {
-      id: "il_obs",
-      section: "Observações",
-      label: "Observações de iluminação",
       type: "textarea",
       requirePhoto: true
     }

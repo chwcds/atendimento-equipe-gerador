@@ -1,5 +1,5 @@
 /**
- * APP.JS - Controlador Principal da Aplicação PWA de Checklist de Manutenção
+ * APP LOGIC - Aplicação Mobile PWA Atendimento Equipe Gerador
  */
 
 class SupermarketChecklistApp {
@@ -8,293 +8,281 @@ class SupermarketChecklistApp {
     this.currentInspection = null;
     this.currentModuleIndex = 0;
     this.currentQuestionIndex = 0;
-    this.activeView = 'new-inspection';
     this.pdfGenerator = new window.ChecklistPDFGenerator();
+    this.deferredPrompt = null;
 
     this.init();
   }
 
-  /**
-   * Inicialização do app, eventos e IndexedDB
-   */
   async init() {
     await this.initIndexedDB();
+    this.initPWAInstall();
     this.setupEventListeners();
-    this.setupNetworkStatus();
-    this.setupPWAInstall();
-    this.updateClock();
-    setInterval(() => this.updateClock(), 1000);
-
-    // Inicia diretamente na tela funcional de inspeção
-    this.startNewInspectionFlow();
+    this.populateUsersAndStores();
+    this.setupNetworkStatusListener();
+    this.initNewInspection();
+    this.renderModuleSelectionCards();
+    this.renderDashboardLists();
   }
 
   /**
-   * Inicialização do IndexedDB (SupermarketChecklistDB)
+   * Inicializa IndexedDB para armazenamento persistente e 100% offline
    */
   initIndexedDB() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('SupermarketChecklistDB', 1);
+      const request = indexedDB.open('SupermarketChecklistDB', 2);
 
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
         if (!db.objectStoreNames.contains('inspections')) {
           const store = db.createObjectStore('inspections', { keyPath: 'id' });
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('updatedAt', 'updatedAt', { unique: false });
         }
+        if (!db.objectStoreNames.contains('settings')) {
+          db.createObjectStore('settings', { keyPath: 'key' });
+        }
       };
 
-      request.onsuccess = (e) => {
-        this.db = e.target.result;
-        console.log("IndexedDB inicializado com sucesso.");
+      request.onsuccess = (event) => {
+        this.db = event.target.result;
         resolve(this.db);
       };
 
-      request.onerror = (e) => {
-        console.error("Erro ao abrir IndexedDB:", e);
-        reject(e);
+      request.onerror = (event) => {
+        console.error("Erro ao inicializar IndexedDB:", event.target.error);
+        reject(event.target.error);
       };
     });
   }
 
   /**
-   * Atualiza relógio em tempo real
+   * Configuração do Prompt de Instalação PWA
    */
-  updateClock() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR');
-    const timeStr = now.toLocaleTimeString('pt-BR');
-
-    const dateElem = document.getElementById('auto-date');
-    const timeElem = document.getElementById('auto-time');
-
-    if (dateElem) dateElem.textContent = dateStr;
-    if (timeElem) timeElem.textContent = timeStr;
-  }
-
-  /**
-   * Registra escutadores de eventos da interface
-   */
-  setupEventListeners() {
-    document.getElementById('btn-new-inspection')?.addEventListener('click', () => this.startNewInspectionFlow());
-    document.getElementById('btn-start-inspection-nav')?.addEventListener('click', () => this.startNewInspectionFlow());
-    document.getElementById('btn-dashboard-nav')?.addEventListener('click', () => this.showView('dashboard'));
-    document.getElementById('btn-drafts-nav')?.addEventListener('click', () => this.showView('dashboard'));
-    document.getElementById('btn-clear-all-data')?.addEventListener('click', () => this.confirmClearAllData());
-
-    // Tela de Identificação
-    document.getElementById('select-user')?.addEventListener('change', (e) => this.updateInspectionUser(e.target.value));
-    document.getElementById('select-store')?.addEventListener('change', (e) => this.onStoreSelected(e.target.value));
-
-    // Tela da Inspeção Ativa (Cartões)
-    document.getElementById('btn-prev-question')?.addEventListener('click', () => this.navigateQuestion(-1));
-    document.getElementById('btn-next-question')?.addEventListener('click', () => this.navigateQuestion(1));
-    document.getElementById('btn-save-draft')?.addEventListener('click', () => this.saveCurrentDraft(true));
-    document.getElementById('btn-finish-checklist')?.addEventListener('click', () => this.prepareAnomaliesOrFinish());
-
-    // Tela de Revisão Final / Opções de PDF
-    document.getElementById('btn-review-back')?.addEventListener('click', () => this.showView('inspection-active'));
-    document.getElementById('btn-review-save-draft')?.addEventListener('click', () => this.saveCurrentDraft(true));
-    
-    document.getElementById('btn-generate-pdf-share')?.addEventListener('click', () => this.sharePDFOnly());
-    document.getElementById('btn-download-pdf-only')?.addEventListener('click', () => this.downloadPDFOnly());
-    document.getElementById('btn-share-pdf-only')?.addEventListener('click', () => this.sharePDFOnly());
-    document.getElementById('btn-review-new-visit')?.addEventListener('click', () => this.startNewInspectionFlow());
-
-    // Fechar modais
-    document.querySelectorAll('.close-modal').forEach(btn => {
-      btn.addEventListener('click', () => this.closeAllModals());
-    });
-  }
-
-  /**
-   * Monitora estado online/offline
-   */
-  setupNetworkStatus() {
-    const updateBanner = () => {
-      const banner = document.getElementById('offline-banner');
-      if (banner) {
-        if (navigator.onLine) {
-          banner.classList.add('hidden');
-        } else {
-          banner.classList.remove('hidden');
-        }
-      }
-    };
-
-    window.addEventListener('online', updateBanner);
-    window.addEventListener('offline', updateBanner);
-    updateBanner();
-  }
-
-  /**
-   * Monitora e lida com a instalação do PWA
-   */
-  setupPWAInstall() {
-    let deferredPrompt;
-    const installBtn = document.getElementById('btn-install-pwa');
-
+  initPWAInstall() {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      deferredPrompt = e;
+      this.deferredPrompt = e;
+      const installBtn = document.getElementById('btn-install-pwa');
       if (installBtn) {
         installBtn.classList.remove('hidden');
-        installBtn.addEventListener('click', () => {
+      }
+    });
+
+    const installBtn = document.getElementById('btn-install-pwa');
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!this.deferredPrompt) return;
+        this.deferredPrompt.prompt();
+        const { outcome } = await this.deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
           installBtn.classList.add('hidden');
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('Usuário aceitou a instalação do PWA');
-            }
-            deferredPrompt = null;
-          });
-        });
-      }
-    });
+        }
+        this.deferredPrompt = null;
+      });
+    }
   }
 
   /**
-   * Alterna entre as telas da aplicação
+   * Monitoramento de Status Online / Offline
    */
-  showView(viewId) {
-    this.activeView = viewId;
-    document.querySelectorAll('.app-view').forEach(view => {
-      view.classList.add('hidden');
-    });
+  setupNetworkStatusListener() {
+    const banner = document.getElementById('offline-banner');
+    const updateStatus = () => {
+      if (!navigator.onLine) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    };
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+  }
 
-    const targetView = document.getElementById(`view-${viewId}`);
-    if (targetView) {
-      targetView.classList.remove('hidden');
-      window.scrollTo(0, 0);
+  /**
+   * Preenche Selects de Inspetores e Lojas
+   */
+  populateUsersAndStores() {
+    // Responsáveis
+    const userSelect = document.getElementById('select-user');
+    if (userSelect && window.CHECKLIST_USERS) {
+      userSelect.innerHTML = '<option value="">-- Selecione o Responsável --</option>';
+      window.CHECKLIST_USERS.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.name;
+        opt.textContent = `${u.name} (${u.role})`;
+        userSelect.appendChild(opt);
+      });
     }
 
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    if (viewId === 'new-inspection' || viewId === 'inspection-active') {
-      document.getElementById('btn-start-inspection-nav')?.classList.add('active');
-    } else if (viewId === 'dashboard') {
-      document.getElementById('btn-dashboard-nav')?.classList.add('active');
+    // Lojas
+    const storeSelect = document.getElementById('select-store');
+    if (storeSelect && window.SUPERMARKET_STORES) {
+      storeSelect.innerHTML = '<option value="">-- Selecione a Loja --</option>';
+      window.SUPERMARKET_STORES.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `[${s.code}] ${s.name} - ${s.city}/${s.state}`;
+        storeSelect.appendChild(opt);
+      });
     }
+  }
 
-    if (viewId === 'dashboard') {
+  /**
+   * Registra Event Listeners
+   */
+  setupEventListeners() {
+    // Navegação Inferior
+    document.getElementById('btn-start-inspection-nav')?.addEventListener('click', () => {
+      this.setActiveNav('btn-start-inspection-nav');
+      this.showView('new-inspection');
+    });
+
+    document.getElementById('btn-dashboard-nav')?.addEventListener('click', () => {
+      this.setActiveNav('btn-dashboard-nav');
       this.renderDashboardLists();
-    }
-  }
+      this.showView('dashboard');
+    });
 
-  /**
-   * Ordena a lista de lojas: D primeiro em ordem crescente, depois L em ordem crescente, depois outras
-   */
-  getSortedStores() {
-    const stores = window.STORES_DATA || [];
-    return [...stores].sort((a, b) => {
-      const codeA = String(a.code || '').trim().toUpperCase();
-      const codeB = String(b.code || '').trim().toUpperCase();
-
-      const charA = codeA[0] || '';
-      const charB = codeB[0] || '';
-
-      const groupA = charA === 'D' ? 0 : (charA === 'L' ? 1 : 2);
-      const groupB = charB === 'D' ? 0 : (charB === 'L' ? 1 : 2);
-
-      if (groupA !== groupB) {
-        return groupA - groupB;
+    // Seleção de Responsável e Loja
+    document.getElementById('select-user')?.addEventListener('change', (e) => {
+      if (this.currentInspection) {
+        this.currentInspection.user = e.target.value;
       }
+    });
 
-      const matchA = codeA.match(/\d+/);
-      const matchB = codeB.match(/\d+/);
-      const numA = matchA ? parseInt(matchA[0], 10) : 999999;
-      const numB = matchB ? parseInt(matchB[0], 10) : 999999;
-
-      if (numA !== numB) {
-        return numA - numB;
+    document.getElementById('select-store')?.addEventListener('change', (e) => {
+      const storeId = e.target.value;
+      const store = (window.SUPERMARKET_STORES || []).find(s => s.id === storeId);
+      if (this.currentInspection) {
+        this.currentInspection.storeId = storeId;
+        this.currentInspection.storeInfo = store || null;
       }
+      this.renderStoreDetails(store);
+    });
 
-      return codeA.localeCompare(codeB, 'pt-BR', { numeric: true });
+    // Controles de Navegação da Pergunta
+    document.getElementById('btn-prev-question')?.addEventListener('click', () => {
+      this.navigateQuestion(-1);
+    });
+
+    document.getElementById('btn-next-question')?.addEventListener('click', () => {
+      this.navigateQuestion(1);
+    });
+
+    document.getElementById('btn-save-draft')?.addEventListener('click', () => {
+      this.saveCurrentDraft(true);
+    });
+
+    document.getElementById('btn-finish-checklist')?.addEventListener('click', () => {
+      this.prepareAnomaliesOrFinish();
+    });
+
+    // Ações na Tela de Revisão
+    document.getElementById('btn-download-pdf-only')?.addEventListener('click', () => {
+      this.downloadPDFOnly();
+    });
+
+    document.getElementById('btn-share-pdf-only')?.addEventListener('click', () => {
+      this.sharePDFOnly();
+    });
+
+    document.getElementById('btn-review-back')?.addEventListener('click', () => {
+      this.showView('inspection-active');
+    });
+
+    document.getElementById('btn-review-new-visit')?.addEventListener('click', () => {
+      if (confirm("Deseja iniciar uma nova visita? As alterações salvas continuam no histórico.")) {
+        this.initNewInspection();
+        this.showView('new-inspection');
+      }
+    });
+
+    // Limpar Dados
+    document.getElementById('btn-clear-all-data')?.addEventListener('click', async () => {
+      if (confirm("ATENÇÃO: Deseja apagar todos os rascunhos e históricos salvos localmente no celular?")) {
+        const tx = this.db.transaction('inspections', 'readwrite');
+        await tx.objectStore('inspections').clear();
+        alert("Todos os dados locais foram limpos com sucesso.");
+        this.initNewInspection();
+        this.renderDashboardLists();
+        this.showView('new-inspection');
+      }
+    });
+
+    // Modais
+    document.querySelectorAll('.close-modal').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.modal-backdrop').classList.add('hidden');
+      });
     });
   }
 
   /**
-   * Inicia fluxo de nova inspeção diretamente na tela principal
+   * Altera a visualização ativa na UI
    */
-  startNewInspectionFlow() {
+  showView(viewName) {
+    document.querySelectorAll('.app-view').forEach(el => el.classList.add('hidden'));
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) {
+      target.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  setActiveNav(btnId) {
+    document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(btnId)?.classList.add('active');
+  }
+
+  /**
+   * Inicializa uma nova inspeção limpa
+   */
+  initNewInspection() {
+    const now = new Date();
+
     this.currentInspection = {
       id: 'INSP_' + Date.now(),
+      status: 'draft',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+      dateTime: now.toISOString(),
       user: '',
       storeId: '',
       storeInfo: null,
-      dateTime: new Date().toISOString(),
       selectedModules: [],
       answers: {},
       anomalies: [],
       geolocation: null,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      stats: { total: 0, conformes: 0, naoConformes: 0, na: 0, photosCount: 0 }
     };
 
-    const selectUser = document.getElementById('select-user');
-    if (selectUser) {
-      selectUser.innerHTML = '<option value="">-- Selecione o Responsável --</option>';
-      (window.USERS_DATA || []).forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u;
-        opt.textContent = u;
-        selectUser.appendChild(opt);
-      });
-    }
+    const userSelect = document.getElementById('select-user');
+    if (userSelect) userSelect.value = '';
 
-    const selectStore = document.getElementById('select-store');
-    if (selectStore) {
-      selectStore.innerHTML = '<option value="">-- Selecione a Loja --</option>';
-      const sortedStores = this.getSortedStores();
-      sortedStores.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `[${s.code}] ${s.name}`;
-        selectStore.appendChild(opt);
-      });
-    }
+    const storeSelect = document.getElementById('select-store');
+    if (storeSelect) storeSelect.value = '';
 
-    document.getElementById('store-details-card')?.classList.add('hidden');
-    this.renderModuleSelectionCards();
-
-    this.showView('new-inspection');
+    this.renderStoreDetails(null);
   }
 
   /**
-   * Quando uma loja é selecionada
+   * Exibe informações da loja selecionada (sem o campo bandeira)
    */
-  onStoreSelected(storeId) {
-    if (!this.currentInspection) return;
+  renderStoreDetails(store) {
+    const card = document.getElementById('store-details-card');
+    if (!card) return;
 
-    const store = (window.STORES_DATA || []).find(s => s.id === storeId);
-    if (store) {
-      this.currentInspection.storeId = store.id;
-      this.currentInspection.storeInfo = store;
-
-      const detailsCard = document.getElementById('store-details-card');
-      if (detailsCard) {
-        detailsCard.classList.remove('hidden');
-        document.getElementById('store-detail-code').textContent = store.code;
-        document.getElementById('store-detail-name').textContent = store.name;
-        document.getElementById('store-detail-address').textContent = `${store.address}, ${store.city} - ${store.state}`;
-      }
-    } else {
-      this.currentInspection.storeId = '';
-      this.currentInspection.storeInfo = null;
-      document.getElementById('store-details-card')?.classList.add('hidden');
+    if (!store) {
+      card.classList.add('hidden');
+      return;
     }
-  }
 
-  /**
-   * Atualiza usuário na inspeção atual
-   */
-  updateInspectionUser(userVal) {
-    if (this.currentInspection) {
-      this.currentInspection.user = userVal;
-    }
+    document.getElementById('store-detail-code').textContent = store.code;
+    document.getElementById('store-detail-name').textContent = store.name;
+    document.getElementById('store-detail-address').textContent = `${store.address}, ${store.city} - ${store.state}`;
+    card.classList.remove('hidden');
   }
 
   /**
@@ -313,7 +301,7 @@ class SupermarketChecklistApp {
 
       card.innerHTML = `
         <div class="module-card-header">
-          <span class="module-card-icon">📋</span>
+          <span class="module-card-icon">⚡</span>
           <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-primary);">Iniciar ➔</span>
         </div>
         <h3 class="module-card-title">${mod.name}</h3>
@@ -418,8 +406,9 @@ class SupermarketChecklistApp {
 
     // Obrigatoriedade de foto condicional
     const isPhotoMandatory = !question.noPhoto && (
-      (question.requirePhoto && !question.requirePhotoOnValue) ||
-      (question.requirePhotoOnValue && savedAns.value === question.requirePhotoOnValue)
+      (question.requirePhoto && !question.requirePhotoOnValue && !question.requirePhotoOnNonValue) ||
+      (question.requirePhotoOnValue && savedAns.value === question.requirePhotoOnValue) ||
+      (question.requirePhotoOnNonValue && savedAns.value && savedAns.value !== question.requirePhotoOnNonValue)
     );
 
     container.innerHTML = `
@@ -490,6 +479,20 @@ class SupermarketChecklistApp {
 
     if (q.type === 'options_3' || q.type === 'select') {
       const opts = q.options || ["Sim", "Não", "Observação"];
+      const showCondField = (
+        ans.isNonConforming ||
+        val === 'Observação' ||
+        (q.allowOtherText && val === 'Outro') ||
+        (q.requireTextOnValue && val === q.requireTextOnValue) ||
+        ans.justification
+      );
+
+      const fieldLabel = (q.allowOtherText && val === 'Outro')
+        ? 'Especifique (Outro): <span class="required-asterisk">*</span>'
+        : (q.requireTextOnValue && val === q.requireTextOnValue)
+        ? 'Digite a observação detalhada: <span class="required-asterisk">*</span>'
+        : `Descrição / Observação ${q.requireTextOnObs && val === 'Observação' ? '<span class="required-asterisk">* (Obrigatória)' : ''}`;
+
       return `
         <div class="option-buttons-group">
           ${opts.map(opt => `
@@ -497,9 +500,9 @@ class SupermarketChecklistApp {
           `).join('')}
         </div>
 
-        <div class="conditional-field ${(ans.isNonConforming || val === 'Observação' || ans.justification) ? '' : 'hidden'}" id="cond-field-${q.id}">
-          <label class="field-label">Descrição / Observação ${q.requireTextOnObs && val === 'Observação' ? '<span class="required-asterisk">* (Obrigatória)</span>' : ''}</label>
-          <textarea class="form-control" rows="2" placeholder="Descreva a observação ou justificativa..." onchange="window.app.setQuestionJustification('${q.id}', this.value)">${ans.justification || ''}</textarea>
+        <div class="conditional-field ${showCondField ? '' : 'hidden'}" id="cond-field-${q.id}">
+          <label class="field-label">${fieldLabel}</label>
+          <textarea class="form-control" rows="2" placeholder="Digite aqui..." onchange="window.app.setQuestionJustification('${q.id}', this.value)">${ans.justification || ''}</textarea>
         </div>
       `;
     }
@@ -661,7 +664,7 @@ class SupermarketChecklistApp {
   }
 
   /**
-   * Navega entre as perguntas (próxima/anterior)
+   * Navega entre as perguntas (próxima/anterior) com validações
    */
   navigateQuestion(delta) {
     const activeQuestions = this.getActiveQuestionsList();
@@ -686,6 +689,11 @@ class SupermarketChecklistApp {
         if (question.requirePhotoOnValue) {
           if (ans && ans.value === question.requirePhotoOnValue && (!ans.photos || ans.photos.length === 0)) {
             alert(`Fotografia é obrigatória quando a resposta for "${question.requirePhotoOnValue}".`);
+            return;
+          }
+        } else if (question.requirePhotoOnNonValue) {
+          if (ans && ans.value && ans.value !== question.requirePhotoOnNonValue && (!ans.photos || ans.photos.length === 0)) {
+            alert(`Fotografia é obrigatória quando a resposta for "${ans.value}".`);
             return;
           }
         } else if (question.requirePhoto) {
@@ -734,7 +742,7 @@ class SupermarketChecklistApp {
   }
 
   /**
-   * Sincroniza automaticamente as não conformidades com o nome exato da pergunta e resposta
+   * Sincroniza automaticamente as não conformidades
    */
   syncAnomalies() {
     if (!this.currentInspection) return;
@@ -1103,7 +1111,18 @@ class SupermarketChecklistApp {
   }
 
   /**
-   * Re-gera o PDF de uma inspeção concluída
+   * Exclui uma inspeção
+   */
+  async deleteInspection(id) {
+    if (confirm("Deseja realmente excluir este rascunho?")) {
+      const tx = this.db.transaction('inspections', 'readwrite');
+      await tx.objectStore('inspections').delete(id);
+      this.renderDashboardLists();
+    }
+  }
+
+  /**
+   * Re-gera o PDF de uma inspeção já concluída
    */
   async reGeneratePDF(id) {
     const tx = this.db.transaction('inspections', 'readonly');
@@ -1117,47 +1136,17 @@ class SupermarketChecklistApp {
           try {
             await this.pdfGenerator.generatePDF(req.result, false);
             this.showPdfLoadingModal(false);
-          } catch (e) {
+          } catch (err) {
             this.showPdfLoadingModal(false);
-            alert("Erro ao gerar PDF: " + e.message);
+            alert("Erro ao gerar PDF: " + err.message);
           }
         }, 100);
       }
     };
   }
-
-  /**
-   * Exclui uma inspeção
-   */
-  async deleteInspection(id) {
-    if (confirm("Tem certeza que deseja excluir este rascunho? Esta ação não pode ser desfeita.")) {
-      const tx = this.db.transaction('inspections', 'readwrite');
-      await tx.objectStore('inspections').delete(id);
-      this.renderDashboardLists();
-    }
-  }
-
-  /**
-   * Confirma e limpa todos os dados locais
-   */
-  async confirmClearAllData() {
-    if (confirm("ATENÇÃO: Esta ação apagar todos os rascunhos e históricos de relatórios deste celular. Deseja continuar?")) {
-      const tx = this.db.transaction('inspections', 'readwrite');
-      await tx.objectStore('inspections').clear();
-      alert("Todos os dados locais foram removidos com sucesso.");
-      this.renderDashboardLists();
-    }
-  }
-
-  /**
-   * Fecha todos os modais da tela
-   */
-  closeAllModals() {
-    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden'));
-  }
 }
 
-// Inicializa o aplicativo quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
+// Inicialização da Aplicação
+window.addEventListener('DOMContentLoaded', () => {
   window.app = new SupermarketChecklistApp();
 });
