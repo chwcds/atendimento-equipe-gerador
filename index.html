@@ -10,13 +10,13 @@
   <title>Atendimento Equipe Gerador</title>
 
   <!-- PWA Manifest & Icons -->
-  <link rel="manifest" href="manifest.json?v=24">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=24">
-  <link rel="shortcut icon" href="icons/icon-192.png?v=24">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=24">
+  <link rel="manifest" href="manifest.json?v=25">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=25">
+  <link rel="shortcut icon" href="icons/icon-192.png?v=25">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=25">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body>
 
@@ -43,14 +43,11 @@
          ========================================================================= -->
     <section id="view-new-inspection" class="app-view">
 
-      <!-- Banner Ilustrativo do Gerador Amarelo 3D com a Versão 7.3.9 -->
+      <!-- Banner Ilustrativo do Gerador Amarelo 3D Centralizado com Versão 7.3.9 Discreta -->
       <div class="generator-app-banner">
+        <div class="generator-version-badge">Versão 7.3.9</div>
         <div class="generator-banner-content">
-          <img src="img/generator.png?v=24" alt="Grupo Gerador" class="generator-banner-img">
-          <div class="generator-version-badge">
-            <span class="version-label">Versão</span>
-            <span class="version-number">7.3.9</span>
-          </div>
+          <img src="img/generator.png?v=25" alt="Grupo Gerador" class="generator-banner-img">
         </div>
       </div>
 
@@ -233,22 +230,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=24"></script>
-  <script src="stores-data.js?v=24"></script>
-  <script src="checklist-data.js?v=24"></script>
+  <script src="users-data.js?v=25"></script>
+  <script src="stores-data.js?v=25"></script>
+  <script src="checklist-data.js?v=25"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=24"></script>
+  <script src="lib/jspdf.umd.min.js?v=25"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=24"></script>
-  <script src="app.js?v=24"></script>
+  <script src="pdf-generator.js?v=25"></script>
+  <script src="app.js?v=25"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=24')
+        navigator.serviceWorker.register('service-worker.js?v=25')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });
