@@ -229,6 +229,15 @@ const CHECKLIST_QUESTIONS = {
       requireTextOnObs: true,
       nonConformingValue: "Não",
       defaultPriority: "Crítica"
+    },
+    {
+      id: "rg_matricula_gerente",
+      section: "Fechamento",
+      label: "Qual a matrícula do gerente ou responsável da loja que acompanhou a visita?",
+      type: "number",
+      required: true,
+      noPhoto: true,
+      placeholder: "Digite a matrícula (número)"
     }
   ],
 
@@ -511,6 +520,15 @@ const CHECKLIST_QUESTIONS = {
       requireTextOnObs: true,
       nonConformingValue: "Não",
       defaultPriority: "Crítica"
+    },
+    {
+      id: "pg_matricula_gerente",
+      section: "Fechamento",
+      label: "Qual a matrícula do gerente ou responsável da loja que acompanhou a visita?",
+      type: "number",
+      required: true,
+      noPhoto: true,
+      placeholder: "Digite a matrícula (número)"
     }
   ],
 
@@ -595,6 +613,15 @@ const CHECKLIST_QUESTIONS = {
       label: "Observações pertinentes da subestação",
       type: "textarea",
       requirePhoto: true
+    },
+    {
+      id: "sub_matricula_gerente",
+      section: "Fechamento",
+      label: "Qual a matrícula do gerente ou responsável da loja que acompanhou a visita?",
+      type: "number",
+      required: true,
+      noPhoto: true,
+      placeholder: "Digite a matrícula (número)"
     }
   ],
 
@@ -701,6 +728,15 @@ const CHECKLIST_QUESTIONS = {
       label: "Observações pertinentes do banco de capacitores",
       type: "textarea",
       requirePhoto: true
+    },
+    {
+      id: "cap_matricula_gerente",
+      section: "Fechamento",
+      label: "Qual a matrícula do gerente ou responsável da loja que acompanhou a visita?",
+      type: "number",
+      required: true,
+      noPhoto: true,
+      placeholder: "Digite a matrícula (número)"
     }
   ]
 };
