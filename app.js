@@ -602,6 +602,14 @@ class SupermarketChecklistApp {
       }
 
       this.currentInspection.answers[moduleId][questionId].photos.push(compressedBase64);
+      
+      // Se for pergunta exclusivamente de foto, marca o valor como 'Foto registrada' para validação
+      const activeQuestions = this.getActiveQuestionsList();
+      const item = activeQuestions.find(q => q.question.id === questionId);
+      if (item && item.question.type === 'photo_only') {
+        this.currentInspection.answers[moduleId][questionId].value = 'Foto registrada';
+      }
+
       this.syncAnomalies();
       this.renderActiveQuestionCard();
     } catch (err) {
@@ -616,6 +624,13 @@ class SupermarketChecklistApp {
     const ans = this.currentInspection.answers[moduleId]?.[questionId];
     if (ans && ans.photos) {
       ans.photos.splice(photoIdx, 1);
+      if (ans.photos.length === 0) {
+        const activeQuestions = this.getActiveQuestionsList();
+        const item = activeQuestions.find(q => q.question.id === questionId);
+        if (item && item.question.type === 'photo_only') {
+          ans.value = '';
+        }
+      }
       this.syncAnomalies();
       this.renderActiveQuestionCard();
     }
@@ -679,7 +694,12 @@ class SupermarketChecklistApp {
       const { moduleId, question } = currentItem;
       const ans = this.currentInspection.answers[moduleId]?.[question.id];
 
-      if (question.required && (!ans || !ans.value)) {
+      if (question.type === 'photo_only') {
+        if (question.required && (!ans || !ans.photos || ans.photos.length === 0)) {
+          alert(`Por favor, registre a fotografia obrigatória para o item "${question.label}".`);
+          return;
+        }
+      } else if (question.required && (!ans || !ans.value)) {
         alert(`O campo "${question.label}" é obrigatório.`);
         return;
       }
