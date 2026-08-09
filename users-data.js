@@ -11,7 +11,8 @@ const USERS_DATA = [
   "GERENTE MANUTENÇÃO"
 ];
 
-// Exporta globalmente no navegador
+// Exporta globalmente no navegador com aliases de segurança
 if (typeof window !== 'undefined') {
   window.USERS_DATA = USERS_DATA;
+  window.CHECKLIST_USERS = USERS_DATA;
 }

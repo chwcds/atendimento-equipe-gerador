@@ -7054,8 +7054,10 @@ function getStoreByIdOrCode(identifier) {
   return STORES_DATA.find(store => store.id === identifier || store.code === identifier) || null;
 }
 
-// Exporta globalmente no navegador
+// Exporta globalmente no navegador com aliases de segurança
 if (typeof window !== 'undefined') {
   window.STORES_DATA = STORES_DATA;
+  window.SUPERMARKET_STORES = STORES_DATA;
   window.getStoreByIdOrCode = getStoreByIdOrCode;
 }
+

@@ -104,23 +104,26 @@ class SupermarketChecklistApp {
    * Preenche Selects de Inspetores e Lojas
    */
   populateUsersAndStores() {
-    // Responsáveis
+    // Responsáveis (Técnicos da Equipe Gerador)
+    const users = window.USERS_DATA || window.CHECKLIST_USERS || [];
     const userSelect = document.getElementById('select-user');
-    if (userSelect && window.CHECKLIST_USERS) {
+    if (userSelect && users.length > 0) {
       userSelect.innerHTML = '<option value="">-- Selecione o Responsável --</option>';
-      window.CHECKLIST_USERS.forEach(u => {
+      users.forEach(u => {
         const opt = document.createElement('option');
-        opt.value = u.name;
-        opt.textContent = `${u.name} (${u.role})`;
+        const userName = typeof u === 'string' ? u : (u.name || u);
+        opt.value = userName;
+        opt.textContent = userName;
         userSelect.appendChild(opt);
       });
     }
 
-    // Lojas
+    // Lojas (640 lojas cadastradas)
+    const stores = window.STORES_DATA || window.SUPERMARKET_STORES || [];
     const storeSelect = document.getElementById('select-store');
-    if (storeSelect && window.SUPERMARKET_STORES) {
+    if (storeSelect && stores.length > 0) {
       storeSelect.innerHTML = '<option value="">-- Selecione a Loja --</option>';
-      window.SUPERMARKET_STORES.forEach(s => {
+      stores.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.id;
         opt.textContent = `[${s.code}] ${s.name} - ${s.city}/${s.state}`;
@@ -154,7 +157,8 @@ class SupermarketChecklistApp {
 
     document.getElementById('select-store')?.addEventListener('change', (e) => {
       const storeId = e.target.value;
-      const store = (window.SUPERMARKET_STORES || []).find(s => s.id === storeId);
+      const stores = window.STORES_DATA || window.SUPERMARKET_STORES || [];
+      const store = stores.find(s => s.id === storeId);
       if (this.currentInspection) {
         this.currentInspection.storeId = storeId;
         this.currentInspection.storeInfo = store || null;
