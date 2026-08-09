@@ -650,6 +650,35 @@ const CHECKLIST_QUESTIONS = {
       placeholder: "Ex: 75"
     },
     {
+      id: "cap_tipo_controle",
+      section: "Visão geral",
+      label: "Banco capacitor com controlador eletrônico ou timer?",
+      type: "options_3",
+      options: ["Controlador eletrônico", "Timer"],
+      required: true,
+      noPhoto: true
+    },
+    {
+      id: "cap_ctrl_modelo_marca",
+      section: "Visão geral",
+      label: "Qual modelo e marca do controlador?",
+      type: "text",
+      placeholder: "Digite a marca e modelo do controlador...",
+      condition: { questionId: "cap_tipo_controle", value: "Controlador eletrônico" },
+      required: true,
+      requirePhoto: true
+    },
+    {
+      id: "cap_timer_detalhes",
+      section: "Visão geral",
+      label: "Qual a hora que o timer liga e desliga e quais os dias da semana ele funciona?",
+      type: "textarea",
+      placeholder: "Ex: Liga às 08:00 e desliga às 22:00, de Segunda a Sábado...",
+      condition: { questionId: "cap_tipo_controle", value: "Timer" },
+      required: true,
+      requirePhoto: true
+    },
+    {
       id: "cap_op_ligado",
       section: "Inspeção operacional",
       label: "1. O banco de capacitores está ligado?",

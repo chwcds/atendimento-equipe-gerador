@@ -165,6 +165,13 @@ class ChecklistPDFGenerator {
       const questions = (window.CHECKLIST_QUESTIONS || {})[modId] || [];
 
       for (const q of questions) {
+        if (q.condition) {
+          const parentAns = modAnswers[q.condition.questionId];
+          if (!parentAns || parentAns.value !== q.condition.value) {
+            continue;
+          }
+        }
+
         const ans = modAnswers[q.id];
         const val = ans ? (ans.value || 'Não informado') : 'Não informado';
         const isNC = ans ? ans.isNonConforming : false;
