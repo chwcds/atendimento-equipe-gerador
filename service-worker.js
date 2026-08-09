@@ -1,8 +1,8 @@
 /**
- * SERVICE WORKER - PWA Offline Cache Manager (v22)
+ * SERVICE WORKER - PWA Offline Cache Manager (v23)
  */
 
-const CACHE_NAME = 'supermarket-checklist-v22';
+const CACHE_NAME = 'supermarket-checklist-v23';
 
 const ASSETS_TO_CACHE = [
   './',

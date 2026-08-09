@@ -160,67 +160,110 @@ class ChecklistPDFGenerator {
       doc.setDrawColor(...this.accentColor);
       doc.setLineWidth(0.5);
       doc.line(margin, y, pageWidth - margin, y);
-      y += 5;
+      y += 6;
 
       const questions = (window.CHECKLIST_QUESTIONS || {})[modId] || [];
 
       for (const q of questions) {
         const ans = modAnswers[q.id];
-        const val = ans ? ans.value : 'Não informado';
+        const val = ans ? (ans.value || 'Não informado') : 'Não informado';
         const isNC = ans ? ans.isNonConforming : false;
 
-        checkPageOverflow(12);
+        checkPageOverflow(14);
 
+        // Indicador de conformidade (círculo verde / vermelho)
         if (isNC) {
           doc.setFillColor(...this.dangerColor);
-          doc.circle(margin + 2, y + 2, 1.8, 'F');
-          doc.setTextColor(...this.dangerColor);
-          doc.setFont("helvetica", "bold");
+          doc.circle(margin + 2, y + 2.2, 1.8, 'F');
         } else {
           doc.setFillColor(40, 167, 69);
-          doc.circle(margin + 2, y + 2, 1.8, 'F');
-          doc.setTextColor(...this.textColor);
-          doc.setFont("helvetica", "normal");
+          doc.circle(margin + 2, y + 2.2, 1.8, 'F');
         }
 
-        doc.setFontSize(8.5);
-        doc.text(`${q.label}:`, margin + 6, y + 3);
+        // Pergunta
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(...this.textColor);
+
+        const questionText = `${q.label}: `;
+        const labelWidth = doc.getTextWidth(questionText);
+        const maxTextWidth = pageWidth - (margin * 2) - 8;
+
+        doc.text(questionText, margin + 6, y + 3);
+
+        // Resposta colocada IMEDIATAMENTE após a pergunta para máxima proximidade
+        const valText = String(val);
+        const valWidth = doc.getTextWidth(valText);
 
         doc.setFont("helvetica", "bold");
-        doc.text(String(val), margin + 110, y + 3);
-
-        y += 6;
-
-        if (ans && ans.justification) {
-          checkPageOverflow(8);
-          doc.setFontSize(8);
-          doc.setFont("helvetica", "italic");
-          doc.setTextColor(100, 100, 100);
-          doc.text(`Justificativa/Obs: ${ans.justification}`, margin + 8, y + 2);
-          y += 5;
+        if (isNC) {
+          doc.setTextColor(...this.dangerColor);
+        } else {
+          doc.setTextColor(...this.primaryColor);
         }
 
+        if (margin + 6 + labelWidth + valWidth < maxTextWidth) {
+          doc.text(valText, margin + 6 + labelWidth, y + 3);
+          y += 6.5;
+        } else {
+          // Se o texto da pergunta for longo, imprime na linha seguinte logo abaixo
+          y += 5.5;
+          doc.text(`Resposta: ${valText}`, margin + 10, y + 2);
+          y += 6;
+        }
+
+        // Justificativa ou Observação
+        if (ans && ans.justification) {
+          checkPageOverflow(10);
+          doc.setFontSize(8.5);
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(90, 90, 90);
+          const justLines = doc.splitTextToSize(`Obs/Justificativa: ${ans.justification}`, pageWidth - (margin * 2) - 16);
+          doc.text(justLines, margin + 8, y + 2);
+          y += (justLines.length * 4.5) + 2;
+        }
+
+        // Fotografias duplicadas de tamanho (60mm x 45mm cada)
         if (ans && ans.photos && ans.photos.length > 0) {
-          checkPageOverflow(35);
-          let photoX = margin + 8;
+          const photoW = 60;
+          const photoH = 45;
+          const photoGap = 6;
+
+          checkPageOverflow(photoH + 8);
+          let photoX = margin + 6;
 
           for (const photoBase64 of ans.photos) {
             try {
               if (photoBase64 && photoBase64.startsWith('data:image')) {
-                doc.addImage(photoBase64, 'JPEG', photoX, y + 1, 30, 22);
-                photoX += 34;
-                if (photoX > pageWidth - margin - 30) {
-                  photoX = margin + 8;
-                  y += 25;
-                  checkPageOverflow(25);
+                // Moldura sutil ao redor da foto
+                doc.setFillColor(245, 245, 245);
+                doc.roundedRect(photoX - 1, y - 1, photoW + 2, photoH + 2, 1, 1, 'F');
+                doc.setDrawColor(210, 210, 210);
+                doc.roundedRect(photoX - 1, y - 1, photoW + 2, photoH + 2, 1, 1, 'D');
+
+                // Renderiza imagem ampliada
+                doc.addImage(photoBase64, 'JPEG', photoX, y, photoW, photoH);
+
+                photoX += photoW + photoGap;
+
+                // Quebra de linha se atingir o limite lateral
+                if (photoX + photoW > pageWidth - margin) {
+                  photoX = margin + 6;
+                  y += photoH + 6;
+                  checkPageOverflow(photoH + 8);
                 }
               }
             } catch (err) {
               console.warn("Foto ignorada ao renderizar PDF devido a formato inválido:", err);
             }
           }
-          y += 25;
+
+          if (photoX !== margin + 6) {
+            y += photoH + 6;
+          }
         }
+
+        y += 2;
       }
 
       y += 4;
