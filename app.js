@@ -695,7 +695,7 @@ class SupermarketChecklistApp {
       const ans = this.currentInspection.answers[moduleId]?.[question.id];
 
       if (question.type === 'photo_only') {
-        if (question.required && (!ans || !ans.photos || ans.photos.length === 0)) {
+        if ((question.required || question.requirePhoto) && (!ans || !ans.photos || ans.photos.length === 0)) {
           alert(`Por favor, registre a fotografia obrigatória para o item "${question.label}".`);
           return;
         }

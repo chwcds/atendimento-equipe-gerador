@@ -632,16 +632,14 @@ const CHECKLIST_QUESTIONS = {
       section: "Visão geral",
       label: "Foto do banco de capacitores com a porta fechada",
       type: "photo_only",
-      requirePhoto: true,
-      required: true
+      requirePhoto: true
     },
     {
       id: "cap_foto_porta_aberta",
       section: "Visão geral",
       label: "Foto do banco de capacitores com a porta aberta",
       type: "photo_only",
-      requirePhoto: true,
-      required: true
+      requirePhoto: true
     },
     {
       id: "cap_potencia_kvar",
@@ -719,8 +717,7 @@ const CHECKLIST_QUESTIONS = {
       section: "Eficiência",
       label: "Reativo registrado no medidor da concessionária",
       type: "photo_only",
-      requirePhoto: true,
-      required: true
+      requirePhoto: true
     },
     {
       id: "cap_obs",

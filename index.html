@@ -10,13 +10,13 @@
   <title>Atendimento Equipe Gerador</title>
 
   <!-- PWA Manifest & Icons -->
-  <link rel="manifest" href="manifest.json?v=31">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=31">
-  <link rel="shortcut icon" href="icons/icon-192.png?v=31">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=31">
+  <link rel="manifest" href="manifest.json?v=32">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=32">
+  <link rel="shortcut icon" href="icons/icon-192.png?v=32">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=32">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=31">
+  <link rel="stylesheet" href="styles.css?v=32">
 </head>
 <body>
 
@@ -48,7 +48,7 @@
         <div style="position: absolute; top: 8px; right: 12px; font-size: 0.72rem; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
           v7.3.9
         </div>
-        <img src="img/generator.png?v=31" alt="Grupo Gerador" style="display: block; margin: 0 auto; max-width: 320px; width: 85%; height: auto; max-height: 220px; object-fit: contain;">
+        <img src="img/generator.png?v=32" alt="Grupo Gerador" style="display: block; margin: 0 auto; max-width: 320px; width: 85%; height: auto; max-height: 220px; object-fit: contain;">
       </div>
 
       <div class="card">
@@ -230,22 +230,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=31"></script>
-  <script src="stores-data.js?v=31"></script>
-  <script src="checklist-data.js?v=31"></script>
+  <script src="users-data.js?v=32"></script>
+  <script src="stores-data.js?v=32"></script>
+  <script src="checklist-data.js?v=32"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=31"></script>
+  <script src="lib/jspdf.umd.min.js?v=32"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=31"></script>
-  <script src="app.js?v=31"></script>
+  <script src="pdf-generator.js?v=32"></script>
+  <script src="app.js?v=32"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=31')
+        navigator.serviceWorker.register('service-worker.js?v=32')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });
