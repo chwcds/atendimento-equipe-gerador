@@ -10,13 +10,13 @@
   <title>Atendimento Equipe Gerador</title>
 
   <!-- PWA Manifest & Icons -->
-  <link rel="manifest" href="manifest.json?v=25">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=25">
-  <link rel="shortcut icon" href="icons/icon-192.png?v=25">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=25">
+  <link rel="manifest" href="manifest.json?v=26">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=26">
+  <link rel="shortcut icon" href="icons/icon-192.png?v=26">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=26">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
 
@@ -43,12 +43,12 @@
          ========================================================================= -->
     <section id="view-new-inspection" class="app-view">
 
-      <!-- Banner Ilustrativo do Gerador Amarelo 3D Centralizado com Versão 7.3.9 Discreta -->
-      <div class="generator-app-banner">
-        <div class="generator-version-badge">Versão 7.3.9</div>
-        <div class="generator-banner-content">
-          <img src="img/generator.png?v=25" alt="Grupo Gerador" class="generator-banner-img">
+      <!-- Banner com Logo do Gerador Grande e Centralizado + Versão Pequena e Discreta -->
+      <div class="card" style="text-align: center; position: relative; padding: 24px 16px 18px; margin-bottom: 14px; background: #ffffff; border-radius: var(--border-radius-md); box-shadow: var(--box-shadow-sm); border: 1px solid var(--border-color);">
+        <div style="position: absolute; top: 8px; right: 12px; font-size: 0.72rem; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+          v7.3.9
         </div>
+        <img src="img/generator.png?v=26" alt="Grupo Gerador" style="display: block; margin: 0 auto; max-width: 320px; width: 85%; height: auto; max-height: 220px; object-fit: contain;">
       </div>
 
       <div class="card">
@@ -230,22 +230,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=25"></script>
-  <script src="stores-data.js?v=25"></script>
-  <script src="checklist-data.js?v=25"></script>
+  <script src="users-data.js?v=26"></script>
+  <script src="stores-data.js?v=26"></script>
+  <script src="checklist-data.js?v=26"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=25"></script>
+  <script src="lib/jspdf.umd.min.js?v=26"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=25"></script>
-  <script src="app.js?v=25"></script>
+  <script src="pdf-generator.js?v=26"></script>
+  <script src="app.js?v=26"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=25')
+        navigator.serviceWorker.register('service-worker.js?v=26')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });
