@@ -169,8 +169,31 @@ class ChecklistPDFGenerator {
         const val = ans ? (ans.value || 'Não informado') : 'Não informado';
         const isNC = ans ? ans.isNonConforming : false;
 
-        checkPageOverflow(14);
+        const photoW = 60;
+        const photoH = 45;
+        const photoGap = 6;
+        const photosList = (ans && ans.photos && ans.photos.length > 0) ? ans.photos : [];
 
+        // 1. CÁLCULO PRÉVIO DA ALTURA TOTAL DO BLOCO (Pergunta + Justificativa + Fotos)
+        // Garante que a pergunta e suas fotos fiquem SEMPRE juntas na mesma página!
+        let totalItemHeight = 8; // Altura da linha de pergunta e resposta
+
+        let justLines = [];
+        if (ans && ans.justification) {
+          doc.setFontSize(8.5);
+          justLines = doc.splitTextToSize(`Obs/Justificativa: ${ans.justification}`, pageWidth - (margin * 2) - 16);
+          totalItemHeight += (justLines.length * 4.5) + 2;
+        }
+
+        if (photosList.length > 0) {
+          const numPhotoRows = Math.ceil(photosList.length / 2); // 2 fotos por linha
+          totalItemHeight += (numPhotoRows * (photoH + 6)) + 2;
+        }
+
+        // Se o bloco completo (pergunta + fotos) não couber no restante da página atual, salta para a próxima
+        checkPageOverflow(totalItemHeight);
+
+        // 2. RENDERIZAÇÃO DA PERGUNTA E RESPOSTA
         // Indicador de conformidade (círculo verde / vermelho)
         if (isNC) {
           doc.setFillColor(...this.dangerColor);
@@ -180,7 +203,6 @@ class ChecklistPDFGenerator {
           doc.circle(margin + 2, y + 2.2, 1.8, 'F');
         }
 
-        // Pergunta
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(...this.textColor);
@@ -206,33 +228,25 @@ class ChecklistPDFGenerator {
           doc.text(valText, margin + 6 + labelWidth, y + 3);
           y += 6.5;
         } else {
-          // Se o texto da pergunta for longo, imprime na linha seguinte logo abaixo
           y += 5.5;
           doc.text(`Resposta: ${valText}`, margin + 10, y + 2);
           y += 6;
         }
 
-        // Justificativa ou Observação
-        if (ans && ans.justification) {
-          checkPageOverflow(10);
+        // 3. RENDERIZAÇÃO DA JUSTIFICATIVA OU OBSERVAÇÃO
+        if (justLines.length > 0) {
           doc.setFontSize(8.5);
           doc.setFont("helvetica", "italic");
           doc.setTextColor(90, 90, 90);
-          const justLines = doc.splitTextToSize(`Obs/Justificativa: ${ans.justification}`, pageWidth - (margin * 2) - 16);
           doc.text(justLines, margin + 8, y + 2);
           y += (justLines.length * 4.5) + 2;
         }
 
-        // Fotografias duplicadas de tamanho (60mm x 45mm cada)
-        if (ans && ans.photos && ans.photos.length > 0) {
-          const photoW = 60;
-          const photoH = 45;
-          const photoGap = 6;
-
-          checkPageOverflow(photoH + 8);
+        // 4. RENDERIZAÇÃO DAS FOTOGRAFIAS AMPLIADAS (Na mesma página da pergunta)
+        if (photosList.length > 0) {
           let photoX = margin + 6;
 
-          for (const photoBase64 of ans.photos) {
+          for (const photoBase64 of photosList) {
             try {
               if (photoBase64 && photoBase64.startsWith('data:image')) {
                 // Moldura sutil ao redor da foto
@@ -246,11 +260,10 @@ class ChecklistPDFGenerator {
 
                 photoX += photoW + photoGap;
 
-                // Quebra de linha se atingir o limite lateral
+                // Quebra de linha se atingir 2 fotos na mesma linha
                 if (photoX + photoW > pageWidth - margin) {
                   photoX = margin + 6;
                   y += photoH + 6;
-                  checkPageOverflow(photoH + 8);
                 }
               }
             } catch (err) {
