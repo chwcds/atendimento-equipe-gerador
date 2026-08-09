@@ -96,7 +96,8 @@ class ChecklistPDFGenerator {
 
     // Linha 2: Loja
     doc.setFont("helvetica", "bold");
-    doc.text(`Loja: [${store.code || 'N/A'}] ${store.name || 'N/A'}`, margin + 4, y + 20);
+    const storeLabel = (store.name || '').startsWith(store.code || '') ? (store.name || 'N/A') : `[${store.code || 'N/A'}] ${store.name || 'N/A'}`;
+    doc.text(`Loja: ${storeLabel}`, margin + 4, y + 20);
     doc.setFont("helvetica", "normal");
 
     // Linha 3: Endereço
