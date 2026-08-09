@@ -126,8 +126,8 @@ class SupermarketChecklistApp {
       stores.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.id;
-        const storeLabel = (s.name || '').startsWith(s.code || '') ? s.name : `[${s.code}] ${s.name}`;
-        opt.textContent = `${storeLabel} - ${s.city}/${s.state}`;
+        const cityState = (s.city && s.state) ? ` - ${s.city}/${s.state}` : '';
+        opt.textContent = `${s.name}${cityState}`;
         storeSelect.appendChild(opt);
       });
     }
@@ -846,8 +846,7 @@ class SupermarketChecklistApp {
     const geo = this.currentInspection.geolocation;
 
     document.getElementById('rev-user').textContent = this.currentInspection.user || 'N/A';
-    const storeLabel = (store.name || '').startsWith(store.code || '') ? (store.name || 'N/A') : `[${store.code || 'N/A'}] ${store.name || 'N/A'}`;
-    document.getElementById('rev-store').textContent = storeLabel;
+    document.getElementById('rev-store').textContent = store.name || store.code || 'N/A';
     document.getElementById('rev-address').textContent = `${store.address || ''}, ${store.city || ''} - ${store.state || ''}`;
     document.getElementById('rev-datetime').textContent = new Date(this.currentInspection.dateTime).toLocaleString('pt-BR');
 
