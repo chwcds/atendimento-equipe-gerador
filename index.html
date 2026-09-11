@@ -10,13 +10,13 @@
   <title>Atendimento Equipe Gerador</title>
 
   <!-- PWA Manifest & Icons -->
-  <link rel="manifest" href="manifest.json?v=7.3.10">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=7.3.10">
-  <link rel="shortcut icon" href="icons/icon-192.png?v=7.3.10">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=7.3.10">
+  <link rel="manifest" href="manifest.json?v=7.3.11">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=7.3.11">
+  <link rel="shortcut icon" href="icons/icon-192.png?v=7.3.11">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=7.3.11">
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="styles.css?v=7.3.10">
+  <link rel="stylesheet" href="styles.css?v=7.3.11">
 </head>
 <body>
 
@@ -231,22 +231,22 @@
   </div>
 
   <!-- Carregamento de Dados e Scripts da Aplicação -->
-  <script src="users-data.js?v=7.3.10"></script>
-  <script src="stores-data.js?v=7.3.10"></script>
-  <script src="checklist-data.js?v=7.3.10"></script>
+  <script src="users-data.js?v=7.3.11"></script>
+  <script src="stores-data.js?v=7.3.11"></script>
+  <script src="checklist-data.js?v=7.3.11"></script>
   
   <!-- jsPDF Biblioteca Local para PDF 100% Offline -->
-  <script src="lib/jspdf.umd.min.js?v=7.3.10"></script>
+  <script src="lib/jspdf.umd.min.js?v=7.3.11"></script>
 
   <!-- Gerador de PDF e Lógica Principal -->
-  <script src="pdf-generator.js?v=7.3.10"></script>
-  <script src="app.js?v=7.3.10"></script>
+  <script src="pdf-generator.js?v=7.3.11"></script>
+  <script src="app.js?v=7.3.11"></script>
 
   <!-- Registro do Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js?v=7.3.10')
+        navigator.serviceWorker.register('service-worker.js?v=7.3.11')
           .then(reg => console.log('Service Worker registrado com sucesso:', reg.scope))
           .catch(err => console.error('Erro ao registrar Service Worker:', err));
       });
