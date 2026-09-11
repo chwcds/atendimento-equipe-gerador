@@ -1,6 +1,6 @@
 ================================================================================
 SCRIPT DE ESPECIFICAÇÃO MESTRE E COMPLETA PARA OUTRA IA - APP ATENDIMENTO EQUIPE GERADOR
-VERSÃO DO APP: 7.3.11
+VERSÃO DO APP: 7.3.12
 ================================================================================
 
 Você é um desenvolvedor Web Sênior especialista em Progressive Web Apps (PWAs), JavaScript Vanilla, CSS3 moderno e geração de relatórios PDF no cliente usando a biblioteca jsPDF.

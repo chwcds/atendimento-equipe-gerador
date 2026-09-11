@@ -105,7 +105,20 @@ class SupermarketChecklistApp {
    */
   populateUsersAndStores() {
     // Responsáveis (Técnicos da Equipe Gerador)
-    const users = window.USERS_DATA || window.CHECKLIST_USERS || [];
+    let users = window.USERS_DATA || window.CHECKLIST_USERS || [
+      "WAGNER CORDEIRO DA SILVA",
+      "ANDREI PELOSI DE ANDRADE",
+      "RENATO ANTONIO GUIMARAES",
+      "THIAGO AUGUSTO FERREIRA",
+      "PEDRO HENRIQUE FERREIRA DA SILVA",
+      "GERENTE MANUTENÇÃO"
+    ];
+
+    // Garantia de inclusão do novo técnico mesmo se o celular estiver rodando com cache antigo
+    if (users.length > 0 && !users.includes("PEDRO HENRIQUE FERREIRA DA SILVA")) {
+      users.splice(4, 0, "PEDRO HENRIQUE FERREIRA DA SILVA");
+    }
+
     const userSelect = document.getElementById('select-user');
     if (userSelect && users.length > 0) {
       userSelect.innerHTML = '<option value="">-- Selecione o Responsável --</option>';
